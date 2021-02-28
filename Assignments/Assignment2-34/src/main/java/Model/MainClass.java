@@ -231,6 +231,7 @@ public class MainClass {
         community1.setName("Roxburry");
         community1.AddHouses(house1);
         community1.AddHouses(house2);
+        community1.AddHouses(house3);
         
         House house4 = new House();
         house4.setName("Davids");
@@ -265,7 +266,8 @@ public class MainClass {
             System.out.println("--------------------------------------");
             System.out.println("Please follow the menu below for the actions to be performed");
             System.out.println("1: Create a new Person Details\n 2:Create a new Patient details\n "
-                    + "3: View All the patient Details\n" + "4:Check for Normality\n"+" 5: Check for Vital Specific Normality\n 6: Exit");
+                    + "3: View All the patient Details\n" + "4:Check for Normality\n"+
+                    " 5: Check for Vital Specific Normality\n 6: Check the number of patients having abnormal BloodPressure in Boston\n");
             Scanner s = new Scanner(System.in);
             boolean flag=true;
             while(flag){
