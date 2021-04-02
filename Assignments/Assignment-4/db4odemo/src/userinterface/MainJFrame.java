@@ -4,10 +4,15 @@
  */
 package userinterface;
 
+import Business.Customer.CustomerDirectory;
 import Business.EcoSystem;
 import Business.DB4OUtil.DB4OUtil;
+import Business.DeliveryMan.DeliveryManDirectory;
+import Business.Employee.EmployeeDirectory;
+import Business.Order.OrderDirectory;
 
 import Business.Organization;
+import Business.Restaurant.RestaurantDirectory;
 import Business.UserAccount.UserAccount;
 import java.awt.CardLayout;
 import javax.swing.JOptionPane;
@@ -15,7 +20,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Lingfeng
+ * @author shiva
  */
 public class MainJFrame extends javax.swing.JFrame {
 
@@ -24,11 +29,48 @@ public class MainJFrame extends javax.swing.JFrame {
      */
     private EcoSystem system;
     private DB4OUtil dB4OUtil = DB4OUtil.getInstance();
+    private CustomerDirectory customerDirectory;
+    private RestaurantDirectory restaurantDirectory;
+    private DeliveryManDirectory deliveryManDirectory;
+    private EmployeeDirectory employeeDirectory;
+    private OrderDirectory orderDirectory;
+
 
     public MainJFrame() {
         initComponents();
         system = dB4OUtil.retrieveSystem();
         this.setSize(1680, 1050);
+        
+        if (system.getCustomerDirectory() == null) {
+            this.customerDirectory = new CustomerDirectory();
+
+        } else {
+            this.customerDirectory = system.getCustomerDirectory();
+        }
+        if (system.getRestaurantDirectory() == null) {
+            this.restaurantDirectory = new RestaurantDirectory();
+
+        } else {
+            this.restaurantDirectory = system.getRestaurantDirectory();
+        }
+        if (system.getDeliveryManDirectory() == null) {
+            deliveryManDirectory = new DeliveryManDirectory();
+
+        } else {
+            this.deliveryManDirectory = system.getDeliveryManDirectory();
+        }
+        if (system.getOrderDirectory() == null) {
+            orderDirectory = new OrderDirectory();
+            system.setOrderDirectory(new OrderDirectory());
+        } else {
+            this.orderDirectory = system.getOrderDirectory();
+        }
+        if (system.getEmployeeDirectory() == null) {
+            employeeDirectory = new EmployeeDirectory();
+
+        } else {
+            this.employeeDirectory = system.getEmployeeDirectory();
+        }
     }
 
     /**
@@ -50,6 +92,7 @@ public class MainJFrame extends javax.swing.JFrame {
         loginJLabel = new javax.swing.JLabel();
         logoutJButton = new javax.swing.JButton();
         container = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,6 +157,20 @@ public class MainJFrame extends javax.swing.JFrame {
         jSplitPane1.setLeftComponent(jPanel1);
 
         container.setLayout(new java.awt.CardLayout());
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 544, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 427, Short.MAX_VALUE)
+        );
+
+        container.add(jPanel2, "card2");
+
         jSplitPane1.setRightComponent(container);
 
         getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
@@ -123,7 +180,26 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void loginJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginJButtonActionPerformed
         // Get user name
-       
+       // Get user name
+        String userName = userNameJTextField.getText();
+        // Get Password
+        char[] passwordCharArray = passwordField.getPassword();
+        String password = String.valueOf(passwordCharArray);
+
+        UserAccount userAccount = system.getUserAccountDirectory().authenticateUser(userName, password);
+        if (userAccount != null) {
+            CardLayout layout = (CardLayout) container.getLayout();
+            container.add("GetUserWorkArea", userAccount.getRole().createWorkArea(container, userAccount, system, customerDirectory,deliveryManDirectory, restaurantDirectory, orderDirectory));
+            layout.next(container);
+            userNameJTextField.setText("");
+            passwordField.setText("");
+            logoutJButton.setEnabled(true);
+            userNameJTextField.setEnabled(false);
+            passwordField.setEnabled(false);
+            loginJButton.setEnabled(false);
+        } else {
+            JOptionPane.showMessageDialog(null, "Username or password incorrect. Please try again.");
+        }
     }//GEN-LAST:event_loginJButtonActionPerformed
 
     private void logoutJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutJButtonActionPerformed
@@ -182,6 +258,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JButton loginJButton;
     private javax.swing.JLabel loginJLabel;
